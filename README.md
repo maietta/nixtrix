@@ -8,6 +8,7 @@ A package manager for SvelteKit. Build your site from pre-built packages — com
 - **Base template**: Start with a solid SvelteKit foundation
 - **Add packages**: Pull in features with a command
 - **Remove packages**: Take out features you no longer need
+- **Safe updates**: Preserves local changes with diff patches
 - **Stay updated**: Update individual packages or all at once
 - **Reproducible**: Full Nix flake setup with pinned dependencies
 
@@ -52,6 +53,25 @@ nix run github:maietta/NixTrix#update
 
 # Update specific package
 nix run github:maietta/NixTrix#update -- sticky-header
+```
+
+#### Handling Local Customizations
+
+If you've modified a package locally, the update will:
+
+1. Detect local changes
+2. Save a diff to `src/lib/nixtrix/patches/<package>-<timestamp>.diff`
+3. Warn you to review and merge manually
+
+Example output:
+```
+⚠ Package 'sticky-header' has local changes, skipping automatic update
+📄 Diff saved to: src/lib/nixtrix/patches/sticky-header-2026-02-15.diff
+```
+
+To force overwrite (loses local changes):
+```bash
+nix run github:maietta/NixTrix#update --force -- sticky-header
 ```
 
 ### 4. Remove Packages

@@ -1,0 +1,8 @@
+{
+  "name": "sticky-header",
+  "type": "component",
+  "description": "Fixed header with navigation",
+  "version": "0.1.0",
+  "author": "NixTrix",
+  "keywords": ["header", "navigation", "sticky"]
+}

@@ -8,6 +8,14 @@ node_modules
 /.svelte-kit
 /build
 
+# Nix
+result
+result-*
+*.drv
+
+# NixTrix patches
+src/lib/nixtrix/patches/
+
 # OS
 .DS_Store
 Thumbs.db

@@ -1,0 +1,8 @@
+{
+  "name": "contact-form",
+  "type": "component",
+  "description": "Ready-to-use contact form with submission handling",
+  "version": "0.1.0",
+  "author": "NixTrix",
+  "keywords": ["form", "contact", "email"]
+}

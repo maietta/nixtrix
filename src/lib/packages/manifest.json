@@ -1,0 +1,18 @@
+{
+  "components": {
+    "sticky-header": {
+      "path": "components/sticky-header",
+      "description": "Fixed header with navigation"
+    },
+    "sidebar": {
+      "path": "components/sidebar",
+      "description": "Collapsible sidebar navigation"
+    },
+    "contact-form": {
+      "path": "components/contact-form",
+      "description": "Ready-to-use contact form"
+    }
+  },
+  "routes": {},
+  "libs": {}
+}

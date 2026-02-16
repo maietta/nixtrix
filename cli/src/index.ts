@@ -5,6 +5,7 @@ import path from 'path';
 
 const NIXTRIX_DIR = process.env.NIXTRIX_DIR || path.join(process.env.HOME || '', 'Projects/nixtrix');
 const MANIFEST_PATH = path.join(NIXTRIX_DIR, 'src/lib/packages/manifest.json');
+const VERSION = '1.0.0';
 
 interface Manifest {
   components: Record<string, { path: string; description: string }>;
@@ -327,12 +328,39 @@ function list() {
   }
 }
 
+async function upgrade() {
+  const cliPath = process.argv[1];
+  const cliDir = path.dirname(cliPath);
+  
+  console.log('Upgrading nixtrix CLI...');
+  
+  try {
+    const { execSync } = require('child_process');
+    
+    const tmpDir = '/tmp/nixtrix-upgrade';
+    execSync(`rm -rf ${tmpDir} && git clone --depth 1 https://github.com/maietta/nixtrix.git ${tmpDir}`, { stdio: 'inherit' });
+    
+    const newCliSrc = path.join(tmpDir, 'cli/src/index.ts');
+    const currentCliSrc = cliPath;
+    
+    await copyFile(newCliSrc, currentCliSrc);
+    
+    console.log('✓ Upgraded to latest version!');
+    console.log(`   Run "bun nixtrix --version" to verify.`);
+    
+    execSync(`rm -rf ${tmpDir}`, { stdio: 'inherit' });
+  } catch (err) {
+    console.error('Failed to upgrade:', err);
+    process.exit(1);
+  }
+}
+
 async function main() {
   const args = process.argv.slice(2);
   
-  if (args.length === 0) {
+  if (args.length === 0 || args[0] === '--help' || args[0] === '-h') {
     console.log(`
-NixTrix - SvelteKit Package Manager
+NixTrix - SvelteKit Package Manager v${VERSION}
 
 Usage: nixtrix <command> [options]
 
@@ -340,13 +368,24 @@ Commands:
   list              List available packages
   add <package>     Add a package to your project
   remove <package>  Remove a package from your project
+  upgrade           Upgrade nixtrix CLI to latest version
+
+Options:
+  --version, -v     Show version number
+  --help, -h        Show this help message
 
 Examples:
   nixtrix list
   nixtrix add sticky-header
   nixtrix add blog
   nixtrix remove sticky-header
+  nixtrix upgrade
 `);
+    process.exit(0);
+  }
+  
+  if (args[0] === '--version' || args[0] === '-v') {
+    console.log(`nixtrix v${VERSION}`);
     process.exit(0);
   }
   
@@ -373,6 +412,10 @@ Examples:
         process.exit(1);
       }
       await remove(args[1]);
+      break;
+    case 'upgrade':
+    case 'up':
+      await upgrade();
       break;
     default:
       console.error(`Unknown command: ${cmd}`);

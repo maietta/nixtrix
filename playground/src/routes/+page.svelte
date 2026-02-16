@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import StickyHeader from '@packages/components/sticky-header/+page.svelte';
 	import Sidebar from '@packages/components/sidebar/+page.svelte';
 	import ContactForm from '@packages/components/contact-form/+page.svelte';

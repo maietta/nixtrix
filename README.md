@@ -1,14 +1,14 @@
-# NixTrix — SvelteKit Component Library
+# NixTrix — SvelteKit Package Manager
 
-A component package manager for SvelteKit. Build your site from a menu of pre-built components, pull updates anytime.
+A package manager for SvelteKit. Build your site from pre-built packages — components, routes, and libraries — pull updates anytime.
 
 ## Features
 
-- **Component-based**: Choose from pre-built components (auth, CMS, layouts, UI)
+- **Packages**: Pre-built components, routes, and libraries
 - **Base template**: Start with a solid SvelteKit foundation
-- **Add components**: Pull in features with a command
-- **Remove components**: Take out features you no longer need
-- **Stay updated**: Update individual components or all at once
+- **Add packages**: Pull in features with a command
+- **Remove packages**: Take out features you no longer need
+- **Stay updated**: Update individual packages or all at once
 - **Reproducible**: Full Nix flake setup with pinned dependencies
 
 ## Quick Start
@@ -28,40 +28,69 @@ cd my-project
 nix develop
 ```
 
-### 2. Add Components
+### 2. Add Packages
 
 ```bash
-# Add a component to your project
+# Add a component (UI piece)
 nix run github:maietta/NixTrix#add -- sticky-header
 
-# Add multiple components
-nix run github:maietta/NixTrix#add -- sticky-header sidebar contact-form
+# Add a route (full page with logic)
+nix run github:maietta/NixTrix#add --route blog
+
+# Add a library (auth, CMS, utils)
+nix run github:maietta/NixTrix#add --lib auth
+
+# Add multiple packages
+nix run github:maietta/NixTrix#add -- sticky-header sidebar --route blog
 ```
 
-### 3. Update Components
+### 3. Update Packages
 
 ```bash
-# Update all components to latest
+# Update all packages to latest
 nix run github:maietta/NixTrix#update
 
-# Update specific component
+# Update specific package
 nix run github:maietta/NixTrix#update -- sticky-header
 ```
 
-### 4. Remove Components
+### 4. Remove Packages
 
 ```bash
-# Remove a component from your project
+# Remove a package from your project
 nix run github:maietta/NixTrix#remove -- sticky-header
 ```
 
-## Available Components
+## Package Types
 
-| Component | Description |
-|-----------|-------------|
+| Type | Flag | Destination |
+|------|------|-------------|
+| **Components** | `--component` (default) | `src/lib/components/` |
+| **Routes** | `--route` | `src/routes/` |
+| **Libraries** | `--lib` | `src/lib/` |
+
+## Available Packages
+
+### Components
+
+| Package | Description |
+|---------|-------------|
 | `sticky-header` | Fixed header with navigation |
 | `sidebar` | Collapsible sidebar navigation |
 | `contact-form` | Ready-to-use contact form |
+
+### Routes
+
+| Package | Description |
+|---------|-------------|
+| `blog` | Blog with posts, archives (coming soon) |
+| `dashboard` | Admin dashboard (coming soon) |
+| `forum` | Discussion forum (coming soon) |
+
+### Libraries
+
+| Package | Description |
+|---------|-------------|
 | `auth` | Login/logout functionality (coming soon) |
 | `cms` | CMS integration (coming soon) |
 
@@ -71,27 +100,44 @@ nix run github:maietta/NixTrix#remove -- sticky-header
 your-project/
 ├── flake.nix              # Your flake with NixTrix input
 ├── src/
-│   └── lib/
-│       └── components/   # Components pulled from NixTrix
-├── src/routes/           # Your pages
+│   ├── lib/
+│   │   ├── components/   # UI components
+│   │   └── */            # Libraries (auth, cms, utils)
+│   └── routes/
+│       └── */            # Full page routes
 └── ...
 ```
 
-## Using Components in Pages
+## Using Packages
 
-Import components from `$lib/components/`:
+### Components
+
+Import from `$lib/components/`:
 
 ```svelte
 <script>
   import StickyHeader from '$lib/components/sticky-header/+page.svelte';
-  import Sidebar from '$lib/components/sidebar/+page.svelte';
 </script>
 
 <StickyHeader />
-<Sidebar />
-<main>
-  {@render children()}
-</main>
+```
+
+### Routes
+
+Routes are automatically available at `/blog`, `/dashboard`, etc.
+
+### Libraries
+
+Import from `$lib/`:
+
+```svelte
+<script>
+  import { user } from '$lib/auth/user';
+</script>
+
+{#if $user}
+  <p>Welcome, {$user.name}</p>
+{/if}
 ```
 
 ## Configuration
@@ -104,9 +150,10 @@ In your `flake.nix`:
   
   outputs = { self, NixTrix }: {
     packages.x86_64-linux.default = NixTrix.lib.mkSvelteProject {
-      selectedComponents = [
-        "sticky-header"
-        "contact-form"
+      selectedPackages = [
+        { type = "component"; name = "sticky-header"; }
+        { type = "component"; name = "contact-form"; }
+        { type = "route"; name = "blog"; }
       ];
     };
   };

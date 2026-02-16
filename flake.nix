@@ -63,9 +63,16 @@
           '';
         };
       }
-    ) // {
+    } // {
       overlays.default = final: prev: {
         nodejs = prev.nodejs_22;
+      };
+    } // {
+      templates = {
+        base = {
+          path = ./templates/base;
+          description = "Basic SvelteKit project with NixTrix";
+        };
       };
     };
 }

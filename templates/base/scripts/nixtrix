@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+NIXTRIX_DIR="${NIXTRIX_DIR:-$HOME/Projects/nixtrix}"
+MANIFEST="$NIXTRIX_DIR/src/lib/packages/manifest.json"
+
+usage() {
+    cat <<EOF
+NixTrix - SvelteKit Package Manager
+
+Usage: nixtrix <command> [options]
+
+Commands:
+    list              List available packages
+    add <package>     Add a package to your project
+    remove <package> Remove a package from your project
+    update [pkg]      Update packages to latest version
+
+Examples:
+    nixtrix list
+    nixtrix add sticky-header
+    nixtrix remove sticky-header
+    nixtrix update
+EOF
+    exit 0
+}
+
+die() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+list_packages() {
+    [[ -f "$MANIFEST" ]] || die "Manifest not found. Set NIXTRIX_DIR to your NixTrix path."
+    
+    echo "Available packages:"
+    echo ""
+    
+    local components=$(jq -r '.components // {} | keys[]' "$MANIFEST" 2>/dev/null || echo "")
+    local routes=$(jq -r '.routes // {} | keys[]' "$MANIFEST" 2>/dev/null || echo "")
+    local libs=$(jq -r '.libs // {} | keys[]' "$MANIFEST" 2>/dev/null || echo "")
+    
+    [[ -n "$components" ]] && echo "Components:" && for pkg in $components; do
+        desc=$(jq -r ".components.\"$pkg\".description // \"\"" "$MANIFEST")
+        echo "  $pkg - $desc"
+    done && echo ""
+    
+    [[ -n "$routes" ]] && echo "Routes:" && for pkg in $routes; do
+        desc=$(jq -r ".routes.\"$pkg\".description // \"\"" "$MANIFEST")
+        echo "  $pkg - $desc"
+    done && echo ""
+    
+    [[ -n "$libs" ]] && echo "Libraries:" && for pkg in $libs; do
+        desc=$(jq -r ".libs.\"$pkg\".description // \"\"" "$MANIFEST")
+        echo "  $pkg - $desc"
+    done
+}
+
+get_pkg_type() {
+    local pkg="$1"
+    if jq -e ".components.\"$pkg\"" "$MANIFEST" >/dev/null 2>&1; then
+        echo "components"
+    elif jq -e ".routes.\"$pkg\"" "$MANIFEST" >/dev/null 2>&1; then
+        echo "routes"
+    elif jq -e ".libs.\"$pkg\"" "$MANIFEST" >/dev/null 2>&1; then
+        echo "libs"
+    else
+        echo ""
+    fi
+}
+
+add_package() {
+    local pkg="$1"
+    [[ -n "$pkg" ]] || die "No package specified"
+    [[ -f "$MANIFEST" ]] || die "Manifest not found"
+    
+    local type=$(get_pkg_type "$pkg")
+    [[ -n "$type" ]] || die "Package '$pkg' not found"
+    
+    local src_dir="$NIXTRIX_DIR/src/lib/packages/$type/$pkg"
+    local dest_dir="src/lib/$type/$pkg"
+    
+    [[ -d "$src_dir" ]] || die "Package source not found: $src_dir"
+    
+    echo "Adding $pkg ($type)..."
+    mkdir -p "$dest_dir"
+    cp -r "$src_dir"/* "$dest_dir/"
+    echo "Done! Added to $dest_dir/"
+}
+
+remove_package() {
+    local pkg="$1"
+    [[ -n "$pkg" ]] || die "No package specified"
+    
+    echo "Removing $pkg..."
+    rm -rf "src/lib/components/$pkg" "src/lib/routes/$pkg" "src/lib/libs/$pkg" "src/lib/$pkg" 2>/dev/null || true
+    echo "Done! Removed from src/lib/"
+}
+
+update_packages() {
+    echo "Checking for updates..."
+    echo "(Update feature coming soon)"
+}
+
+[[ $# -eq 0 ]] && usage
+
+case "$1" in
+    list) list_packages ;;
+    add) add_package "$2" ;;
+    remove|rm) remove_package "$2" ;;
+    update|up) update_packages ;;
+    -h|--help|help) usage ;;
+    *) die "Unknown command: $1" ;;
+esac

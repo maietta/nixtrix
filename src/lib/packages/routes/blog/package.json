@@ -1,0 +1,14 @@
+{
+  "name": "@nixtrix/blog",
+  "version": "1.0.0",
+  "description": "Blog with Bun SQLite",
+  "type": "module",
+  "exports": {
+    "./schema": "./schema.ts",
+    "./routes/*": "./routes/*.svelte"
+  },
+  "nixtrix": {
+    "type": "route",
+    "routes": ["/blog", "/blog/:slug"]
+  }
+}

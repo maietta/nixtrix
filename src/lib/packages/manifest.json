@@ -13,7 +13,12 @@
       "description": "Ready-to-use contact form"
     }
   },
-  "routes": {},
+  "routes": {
+    "blog": {
+      "path": "routes/blog",
+      "description": "Blog with SQLite database"
+    }
+  },
   "libs": {
     "auth": {
       "path": "libs/auth",

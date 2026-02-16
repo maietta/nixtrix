@@ -10,22 +10,22 @@
     let
       lib = import ./cli/lib.nix { pkgs = nixpkgs; };
     in
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = import nixpkgs {
-          inherit system;
-          overlays = [ self.overlays.default ];
-        };
-        add = import ./cli/add.nix { inherit pkgs; };
-        update = import ./cli/update.nix { inherit pkgs; };
-        remove = import ./cli/remove.nix { inherit pkgs; };
-      in
-      {
-        packages = {
+    {
+      packages = flake-utils.lib.eachDefaultSystem (system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ self.overlays.default ];
+          };
+          add = import ./cli/add.nix { inherit pkgs; };
+          update = import ./cli/update.nix { inherit pkgs; };
+          remove = import ./cli/remove.nix { inherit pkgs; };
+        in
+        {
           inherit add update remove;
-          
+
           default = self.packages.${system}.add;
-          
+
           list-packages = pkgs.writeShellApplication {
             name = "nixtrix-list";
             text = ''
@@ -47,27 +47,34 @@
               done
             '';
           };
-        };
+        }
+      );
 
-        devShells.default = pkgs.mkShell {
-          packages = [
-            pkgs.nodejs_22
-            pkgs.pnpm
-            pkgs.eslint
-            pkgs.prettier
-          ];
+      devShells = flake-utils.lib.eachDefaultSystem (system:
+        let
+          pkgs = import nixpkgs { inherit system; };
+        in
+        {
+          default = pkgs.mkShell {
+            packages = [
+              pkgs.nodejs_22
+              pkgs.pnpm
+              pkgs.eslint
+              pkgs.prettier
+            ];
 
-          shellHook = ''
-            export NODE_ENV=development
-            echo "NixTrix dev shell ready"
-          '';
-        };
-      }
-    } // {
+            shellHook = ''
+              export NODE_ENV=development
+              echo "NixTrix dev shell ready"
+            '';
+          };
+        }
+      );
+
       overlays.default = final: prev: {
         nodejs = prev.nodejs_22;
       };
-    } // {
+
       templates = {
         base = {
           path = ./templates/base;

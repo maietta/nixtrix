@@ -1,0 +1,8 @@
+{
+  "name": "nixtrix",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "nixtrix": "./src/index.ts"
+  }
+}

@@ -7,6 +7,7 @@ A component package manager for SvelteKit. Build your site from a menu of pre-bu
 - **Component-based**: Choose from pre-built components (auth, CMS, layouts, UI)
 - **Base template**: Start with a solid SvelteKit foundation
 - **Add components**: Pull in features with a command
+- **Remove components**: Take out features you no longer need
 - **Stay updated**: Update individual components or all at once
 - **Reproducible**: Full Nix flake setup with pinned dependencies
 
@@ -47,6 +48,13 @@ nix run github:maietta/NixTrix#update
 nix run github:maietta/NixTrix#update -- sticky-header
 ```
 
+### 4. Remove Components
+
+```bash
+# Remove a component from your project
+nix run github:maietta/NixTrix#remove -- sticky-header
+```
+
 ## Available Components
 
 | Component | Description |
@@ -82,7 +90,7 @@ Import components from `$lib/components/`:
 <StickyHeader />
 <Sidebar />
 <main>
-  <slot />
+  {@render children()}
 </main>
 ```
 

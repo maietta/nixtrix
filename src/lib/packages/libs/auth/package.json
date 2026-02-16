@@ -1,0 +1,29 @@
+{
+  "name": "auth",
+  "type": "lib",
+  "version": "0.1.0",
+  "description": "Authentication with better-auth",
+  "setup": {
+    "hooks.server.ts": {
+      "strategy": "merge",
+      "mergeType": "append",
+      "exports": [
+        "authHooks",
+        "sessionCookieName"
+      ],
+      "description": "Add auth hooks to existing handle function"
+    },
+    "app.d.ts": {
+      "strategy": "merge",
+      "mergeType": "append",
+      "description": "Add App.Locals type definitions"
+    },
+    "src/routes/+layout.server.ts": {
+      "strategy": "create",
+      "description": "Add user to layout load function"
+    }
+  },
+  "dependencies": {
+    "better-auth": "^1.0.0"
+  }
+}

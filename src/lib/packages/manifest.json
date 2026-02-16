@@ -14,5 +14,10 @@
     }
   },
   "routes": {},
-  "libs": {}
+  "libs": {
+    "auth": {
+      "path": "libs/auth",
+      "description": "Authentication with better-auth"
+    }
+  }
 }
